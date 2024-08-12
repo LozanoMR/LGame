@@ -1,5 +1,18 @@
 #!/bin/bash
 
+# Bandera ASCII
+banner() {
+  cat << "EOF"
+██             ██████   █████  ███    ███ ███████ 
+██            ██       ██   ██ ████  ████ ██      
+██      █████ ██   ███ ███████ ██ ████ ██ █████   
+██            ██    ██ ██   ██ ██  ██  ██ ██      
+███████        ██████  ██   ██ ██      ██ ███████ 
+                                                  
+                                                  
+EOF
+}
+
 # Lista de paquetes de Google y otros servicios a desactivar o activar
 PACKAGES=(
   "com.google.android.gms"           # Google Play Services
@@ -12,6 +25,17 @@ PACKAGES=(
   "com.whatsapp"                      # WhatsApp
   "com.telegram.messenger"            # Telegram
   "com.android.chrome"                # Google Chrome
+)
+
+# Lista de paquetes de aplicaciones del sistema fundamentales a excluir de la limpieza de caché
+SYSTEM_APPS=(
+  "android"                  # Sistema Android
+  "com.android.systemui"     # Interfaz de usuario del sistema
+  "com.android.phone"        # Gestión de llamadas y red
+  "com.android.settings"     # Configuración del sistema
+  "com.android.launcher"     # Lanzador de aplicaciones
+  "com.android.inputmethod.latin" # Teclado de Android
+  "com.google.android.gsf"   # Google Services Framework (a veces necesario para el sistema)
 )
 
 function disable_services() {
@@ -32,19 +56,46 @@ function enable_services() {
   echo "Servicios y aplicaciones activados."
 }
 
+function disable_animations() {
+  echo "Desactivando animaciones del sistema..."
+  settings put global window_animation_scale 0
+  settings put global transition_animation_scale 0
+  settings put global animator_duration_scale 0
+  echo "Animaciones del sistema desactivadas."
+}
+
+function enable_animations() {
+  echo "Activando animaciones del sistema..."
+  settings put global window_animation_scale 1
+  settings put global transition_animation_scale 1
+  settings put global animator_duration_scale 1
+  echo "Animaciones del sistema activadas."
+}
+
+function get_installed_packages() {
+  # Obtener una lista de todas las aplicaciones instaladas, excluyendo las del sistema
+  pm list packages | cut -f 2 -d ":" | grep -v -e "$(printf "%s|" "${SYSTEM_APPS[@]}" | sed 's/|$//')"
+}
+
+function clear_cache() {
+  echo "Limpiando caché de aplicaciones instaladas..."
+  for package in $(get_installed_packages); do
+    pm clear "$package" 2>/dev/null
+    echo "Caché limpiado para: $package"
+  done
+  echo "Caché de aplicaciones limpiada."
+}
+
 function show_menu() {
-clear
-echo "██             ██████   █████  ███    ███ ███████ "
-echo "██            ██       ██   ██ ████  ████ ██      "
-echo "██      █████ ██   ███ ███████ ██ ████ ██ █████   "
-echo "██            ██    ██ ██   ██ ██  ██  ██ ██      "
-echo "███████        ██████  ██   ██ ██      ██ ███████ "
-echo
-echo
+  clear
+  banner
   echo "Seleccione una opción:"
   echo "1. Activar servicios y aplicaciones"
   echo "2. Desactivar servicios y aplicaciones"
-  echo "3. Salir"
+  echo "3. Desactivar animaciones del sistema"
+  echo "4. Activar animaciones del sistema"
+  echo "5. Limpiar caché de aplicaciones instaladas (excepto aplicaciones del sistema)"
+  echo "6. Salir"
 }
 
 while true; do
@@ -58,6 +109,15 @@ while true; do
       disable_services
       ;;
     3)
+      disable_animations
+      ;;
+    4)
+      enable_animations
+      ;;
+    5)
+      clear_cache
+      ;;
+    6)
       echo "Saliendo..."
       exit 0
       ;;
@@ -66,4 +126,3 @@ while true; do
       ;;
   esac
 done
-
