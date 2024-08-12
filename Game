@@ -1,0 +1,69 @@
+#!/bin/bash
+
+# Lista de paquetes de Google y otros servicios a desactivar o activar
+PACKAGES=(
+  "com.google.android.gms"           # Google Play Services
+  "com.google.android.gsf"            # Google Services Framework
+  "com.android.vending"               # Google Play Store
+  "com.google.android.apps.photos"    # Google Photos
+  "com.google.android.youtube"         # YouTube
+  "com.facebook.katana"               # Facebook
+  "com.twitter.android"               # Twitter
+  "com.whatsapp"                      # WhatsApp
+  "com.telegram.messenger"            # Telegram
+  "com.android.chrome"                # Google Chrome
+)
+
+function disable_services() {
+  echo "Desactivando servicios y aplicaciones..."
+  for package in "${PACKAGES[@]}"; do
+    pm disable-user --user 0 "$package" 2>/dev/null
+    echo "Desactivado: $package"
+  done
+  echo "Servicios y aplicaciones desactivados."
+}
+
+function enable_services() {
+  echo "Activando servicios y aplicaciones..."
+  for package in "${PACKAGES[@]}"; do
+    pm enable "$package" 2>/dev/null
+    echo "Activado: $package"
+  done
+  echo "Servicios y aplicaciones activados."
+}
+
+function show_menu() {
+clear
+echo "██             ██████   █████  ███    ███ ███████ "
+echo "██            ██       ██   ██ ████  ████ ██      "
+echo "██      █████ ██   ███ ███████ ██ ████ ██ █████   "
+echo "██            ██    ██ ██   ██ ██  ██  ██ ██      "
+echo "███████        ██████  ██   ██ ██      ██ ███████ "
+echo
+echo
+  echo "Seleccione una opción:"
+  echo "1. Activar servicios y aplicaciones"
+  echo "2. Desactivar servicios y aplicaciones"
+  echo "3. Salir"
+}
+
+while true; do
+  show_menu
+  read -p "Ingrese su elección: " choice
+  case $choice in
+    1)
+      enable_services
+      ;;
+    2)
+      disable_services
+      ;;
+    3)
+      echo "Saliendo..."
+      exit 0
+      ;;
+    *)
+      echo "Opción no válida. Por favor, intente de nuevo."
+      ;;
+  esac
+done
+
