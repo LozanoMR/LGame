@@ -94,7 +94,7 @@ function show_menu() {
   echo "2. Desactivar servicios y aplicaciones"
   echo "3. Desactivar animaciones del sistema"
   echo "4. Activar animaciones del sistema"
-  echo "5. Limpiar caché de aplicaciones instaladas (excepto aplicaciones del sistema)"
+  echo "5. Limpiar datos de aplicaciones instaladas (excepto aplicaciones del sistema)"
   echo "6. Salir"
 }
 
